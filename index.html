@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Student Management Dashboard</h2>
+
+    <!-- Input -->
+    <input type="text" id="studentName" placeholder="Enter student name">
+    <button class="add-btn" onclick="addStudent()">Add Student</button>
+
+    <!-- Search -->
+    <input type="text" id="search" placeholder="Search student by name" onkeyup="searchStudent()">
+
+    <!-- Message -->
+    <div class="message" id="message"></div>
+
+    <!-- Student List -->
+    <div id="studentList"></div>
+
+    <!-- Total -->
+    <div class="total">
+        Total Students: <span id="total">0</span>
+    </div>
+</div>
+
+<script>
+    let students = [];
+    let editIndex = -1;
+
+    // ✅ Add Student Function
+    function addStudent() {
+        const name = document.getElementById("studentName").value.trim();
+
+        if (name === "") {
+            document.getElementById("message").innerText =
+                "Please enter a student name!";
+            return;
+        }
+
+        // ✅ Duplicate Check
+        if (students.includes(name) && editIndex === -1) {
+            document.getElementById("message").innerText =
+                "Student already exists!";
+            return;
+        }
+
+        // ✅ If Editing
+        if (editIndex !== -1) {
+            students[editIndex] = name;
+            editIndex = -1;
+            document.getElementById("message").innerText =
+                "Student updated successfully!";
+        } 
+        else {
+            // ✅ Add New Student
+            students.push(name);
+            document.getElementById("message").innerText =
+                "Student added successfully!";
+        }
+
+        // Clear input
+        document.getElementById("studentName").value = "";
+
+        // Refresh list
+        displayStudents();
+    }
+
+    // ✅ Display Students
+    function displayStudents() {
+        const list = document.getElementById("studentList");
+        list.innerHTML = "";
+
+        students.forEach((student, index) => {
+            const div = document.createElement("div");
+            div.className = "student";
+
+            div.innerHTML = `
+                <span>${student}</span>
+                <div>
+                    <button class="edit-btn" onclick="editStudent(${index})">Edit</button>
+                    <button class="delete-btn" onclick="deleteStudent(${index})">Delete</button>
+                </div>
+            `;
+
+            list.appendChild(div);
+        });
+
+        document.getElementById("total").innerText = students.length;
+    }
+
+    // ✅ Edit Student
+    function editStudent(index) {
+        document.getElementById("studentName").value = students[index];
+        editIndex = index;
+        document.getElementById("message").innerText =
+            "Editing student...";
+    }
+
+    // ✅ Delete Student
+    function deleteStudent(index) {
+        students.splice(index, 1);
+        displayStudents();
+        document.getElementById("message").innerText =
+            "Student deleted successfully!";
+    }
+
+    // ✅ Search Student
+    function searchStudent() {
+        const search = document.getElementById("search").value.toLowerCase();
+        const list = document.getElementById("studentList");
+        list.innerHTML = "";
+
+        students
+            .filter(student => student.toLowerCase().includes(search))
+            .forEach((student, index) => {
+                const div = document.createElement("div");
+                div.className = "student";
+
+                div.innerHTML = `
+                    <span>${student}</span>
+                    <div>
+                        <button class="edit-btn" onclick="editStudent(${index})">Edit</button>
+                        <button class="delete-btn" onclick="deleteStudent(${index})">Delete</button>
+                    </div>
+                `;
+
+                list.appendChild(div);
+            });
+    }
+</script>
+
+</body>
+</html>
